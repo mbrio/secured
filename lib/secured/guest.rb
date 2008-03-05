@@ -20,25 +20,14 @@
 # Copyright:: Copyright (C) 2008 Michael Diolosa <michael.diolosa@gmail.com>
 # License:: Distributes under the AGPL
 
-require 'rake'
-require 'rake/testtask'
-require 'rake/rdoctask'
-
-desc 'Default: run unit tests.'
-task :default => :test
-
-desc 'Test the secured plugin.'
-Rake::TestTask.new(:test) do |t|
-  t.libs << 'lib'
-  t.pattern = 'test/**/*_test.rb'
-  t.verbose = true
-end
-
-desc 'Generate documentation for the secured plugin.'
-Rake::RDocTask.new(:rdoc) do |rdoc|
-  rdoc.rdoc_dir = 'rdoc'
-  rdoc.title    = 'Secured'
-  rdoc.options << '--line-numbers' << '--inline-source'
-  rdoc.rdoc_files.include('README')
-  rdoc.rdoc_files.include('lib/**/*.rb')
+module Secured
+  class Guest
+    def guest?
+      true
+    end
+  
+    def is_in_role?(roles)
+      false
+    end
+  end
 end
