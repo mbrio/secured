@@ -1,38 +1,94 @@
-ENV["RAILS_ENV"] = "test"
-require File.expand_path(File.dirname(__FILE__) + "/../config/environment")
-require 'test_help'
+require 'rubygems'
+require 'action_controller'
+require 'action_controller/test_process'
+require 'test/unit'
+require File.dirname(__FILE__) + '/../lib/secured'
 
-class Test::Unit::TestCase
-  # Transactional fixtures accelerate your tests by wrapping each test method
-  # in a transaction that's rolled back on completion.  This ensures that the
-  # test database remains unchanged so your fixtures don't have to be reloaded
-  # between every test method.  Fewer database queries means faster tests.
-  #
-  # Read Mike Clark's excellent walkthrough at
-  #   http://clarkware.com/cgi/blosxom/2005/10/24#Rails10FastTesting
-  #
-  # Every Active Record database supports transactions except MyISAM tables
-  # in MySQL.  Turn off transactional fixtures in this case; however, if you
-  # don't care one way or the other, switching from MyISAM to InnoDB tables
-  # is recommended.
-  #
-  # The only drawback to using transactional fixtures is when you actually 
-  # need to test transactions.  Since your test is bracketed by a transaction,
-  # any transactions started in your code will be automatically rolled back.
-  self.use_transactional_fixtures = true
+ActionController::Base.logger = nil
+ActionController::Routing::Routes.reload rescue nil
 
-  # Instantiated fixtures are slow, but give you @david where otherwise you
-  # would need people(:david).  If you don't want to migrate your existing
-  # test cases which use the @david style and don't mind the speed hit (each
-  # instantiated fixtures translates to a database query per test method),
-  # then set this back to true.
-  self.use_instantiated_fixtures  = false
+class User
+  attr_accessor :role
+  
+  def guest?
+    false
+  end
+  
+  def is_in_role?(roles)
+    roles = roles || []
+    roles = [roles] unless roles.is_a?(Array)
+    
+    return true if role && roles.include?(role)
+    false
+  end
+end
 
-  # Setup all fixtures in test/fixtures/*.(yml|csv) for all tests in alphabetical order.
-  #
-  # Note: You'll currently still have to declare fixtures explicitly in integration tests
-  # -- they do not yet inherit this setting
-  fixtures :all
+class SecuredController < ActionController::Base
+  include Secured
+  
+  def rescue_action(exception)
+    if exception.is_a?(Secured::SecurityError)
+      render :text => %{ <div class="error">You do not have the permissions to view this page</div>
+                         <div class="flash">#{flash[:notice]}</div> }
+    end
+  end
+  
+  def a
+    render :text => %{ <div class="success">You have the permissions to view this page</div>
+                       <div class="flash">#{flash[:notice]}</div> }
+  end
+  
+  def b
+    render :text => %{ <div class="success">You have the permissions to view this page</div>
+                       <div class="flash">#{flash[:notice]}</div> }
+  end
 
-  # Add more helper methods to be used by all tests here...
+  def c
+   render :text => %{ <div class="success">You have the permissions to view this page</div>
+                      <div class="flash">#{flash[:notice]}</div> }
+ end
+end
+
+class SecuredOnlyController < SecuredController
+  include Secured
+  
+  secured :only => [:a]
+end
+
+class SecuredExceptController < SecuredController
+  include Secured
+  
+  secured :except => [:b]
+end
+
+class SecuredMultiController < SecuredController
+  include Secured
+
+  secured :except => [:b]  
+  secured :only => [:b]
+end
+
+class SecuredGuestController < SecuredController
+  include Secured
+
+  before_filter :initialize_user
+  secured :only => :a
+  secured :only => :b, :for_roles => :administrator
+  
+  def initialize_user
+    @user = Guest.new
+  end
+end
+
+class SecuredRoleController < SecuredController
+  include Secured
+
+  before_filter :initialize_user
+  secured :only => :a, :for_roles => :user
+  secured :only => :b, :for_roles => :administrator
+  
+  def initialize_user
+    @user = User.new
+    @user.role = :user
+  end
 end
