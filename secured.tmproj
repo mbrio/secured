@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>currentDocument</key>
-	<string>vendor/plugins/secured/lib/secured.rb</string>
+	<string>vendor/plugins/secured/test/test_helper.rb</string>
 	<key>documents</key>
 	<array>
 		<dict>
@@ -21,28 +21,28 @@
 	<integer>200</integer>
 	<key>metaData</key>
 	<dict>
-		<key>vendor/plugins/secured/lib/secured.rb</key>
+		<key>vendor/plugins/secured/test/test_helper.rb</key>
 		<dict>
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>45</integer>
+				<integer>0</integer>
 				<key>line</key>
-				<integer>31</integer>
+				<integer>27</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>4</integer>
+			<integer>45</integer>
 		</dict>
 	</dict>
 	<key>openDocuments</key>
 	<array>
-		<string>vendor/plugins/secured/lib/secured.rb</string>
+		<string>vendor/plugins/secured/test/test_helper.rb</string>
 	</array>
 	<key>showFileHierarchyDrawer</key>
 	<true/>
 	<key>windowFrame</key>
-	<string>{{210, 0}, {1190, 878}}</string>
+	<string>{{209, 0}, {1190, 878}}</string>
 </dict>
 </plist>
