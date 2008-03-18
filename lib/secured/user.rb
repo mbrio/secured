@@ -27,10 +27,12 @@ module Secured
     end
 
     def is_in_role?(role_list)
-      role_list = [role_list] unless role_list.is_a?(Array)
+      unless role_list.nil?
+        role_list = [role_list] unless role_list.is_a?(Array)
       
-      return (@roles & role_list).length > 0 if @roles
-      return role_list.include?(@role) if @role
+        return (@roles & role_list).length > 0 if @roles
+        return role_list.include?(@role) if @role
+      end
       
       return false
     end

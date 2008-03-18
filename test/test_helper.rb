@@ -135,6 +135,18 @@ class Test::SecuredRoleController < Test::SecuredController
   end
 end
 
+class Test::SecuredRoleArrayController < Test::SecuredController
+  include Secured
+
+  before_filter :initialize_user
+  secured :only => [ :a, :b ], :for_roles => [ :users, :administrators ]
+  
+  def initialize_user
+    @user = Test::User.new
+    @user.role = :users
+  end
+end
+
 class Test::SecuredUserManyRolesController < Test::SecuredController
   include Secured
 
@@ -142,6 +154,18 @@ class Test::SecuredUserManyRolesController < Test::SecuredController
   secured :only => :a, :for_roles => :users
   secured :only => :b, :for_roles => :administrators
   secured :only => :c, :for_roles => :editors
+  
+  def initialize_user
+    @user = Test::UserManyRoles.new
+    @user.roles = [:users, :administrators]
+  end
+end
+
+class Test::SecuredUserManyRolesArrayController < Test::SecuredController
+  include Secured
+
+  before_filter :initialize_user
+  secured :only => [ :a, :b, :c ], :for_roles => [ :users, :administrators, :editors ]
   
   def initialize_user
     @user = Test::UserManyRoles.new

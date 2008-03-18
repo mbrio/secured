@@ -128,6 +128,38 @@ class SecuredTest < Test::Unit::TestCase
     assert_response :success
     assert_select 'div.error'
   end
+
+  def test_user_role_array
+    @controller = Test::SecuredRoleArrayController.new
+    
+    get :a
+    assert_response :success
+    assert_select 'div.success'
+    
+    get :b
+    assert_response :success
+    assert_select 'div.success'
+    
+    get :c
+    assert_response :success
+    assert_select 'div.success'
+  end
+    
+  def test_user_many_roles_array
+    @controller = Test::SecuredUserManyRolesArrayController.new
+    
+    get :a
+    assert_response :success
+    assert_select 'div.success'
+    
+    get :b
+    assert_response :success
+    assert_select 'div.success'
+    
+    get :c
+    assert_response :success
+    assert_select 'div.success'
+  end
   
   def test_user_no_roles
     @controller = Test::SecuredUserNoRolesController.new
