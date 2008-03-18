@@ -29,7 +29,7 @@ class SecuredTest < Test::Unit::TestCase
   end
   
   def test_not_secured
-    @controller = SecuredController.new
+    @controller = Test::SecuredController.new
     
     get :a
     assert_response :success
@@ -37,7 +37,7 @@ class SecuredTest < Test::Unit::TestCase
   end
   
   def test_only
-    @controller = SecuredOnlyController.new
+    @controller = Test::SecuredOnlyController.new
     
     get :a
     assert_response :success
@@ -49,7 +49,7 @@ class SecuredTest < Test::Unit::TestCase
   end
   
   def test_except
-    @controller = SecuredExceptController.new
+    @controller = Test::SecuredExceptController.new
     
     get :a
     assert_response :success
@@ -61,7 +61,7 @@ class SecuredTest < Test::Unit::TestCase
   end
   
   def test_multi
-    @controller = SecuredMultiController.new
+    @controller = Test::SecuredMultiController.new
     
     get :a
     assert_response :success
@@ -71,9 +71,9 @@ class SecuredTest < Test::Unit::TestCase
     assert_response :success
     assert_select 'div.error'
   end
-
+  
   def test_guest
-    @controller = SecuredGuestController.new
+    @controller = Test::SecuredGuestController.new
     
     get :a
     assert_response :success
@@ -89,7 +89,7 @@ class SecuredTest < Test::Unit::TestCase
   end
     
   def test_role
-    @controller = SecuredRoleController.new
+    @controller = Test::SecuredRoleController.new
     
     get :a
     assert_response :success
@@ -98,6 +98,63 @@ class SecuredTest < Test::Unit::TestCase
     get :b
     assert_response :success
     assert_select 'div.error'
+    
+    get :c
+    assert_response :success
+    assert_select 'div.success'
+  end
+  
+  def test_view_helpers
+    @controller = Test::SecuredRoleController.new
+    
+    get :d
+    assert_response :success
+    assert_select 'div.users'
+    assert_select 'div', :count => 1
+  end
+  
+  def test_user_many_roles
+    @controller = Test::SecuredUserManyRolesController.new
+    
+    get :a
+    assert_response :success
+    assert_select 'div.success'
+    
+    get :b
+    assert_response :success
+    assert_select 'div.success'
+    
+    get :c
+    assert_response :success
+    assert_select 'div.error'
+  end
+  
+  def test_user_no_roles
+    @controller = Test::SecuredUserNoRolesController.new
+    
+    get :a
+    assert_response :success
+    assert_select 'div.error'
+    
+    get :b
+    assert_response :success
+    assert_select 'div.error'
+    
+    get :c
+    assert_response :success
+    assert_select 'div.error'
+  end
+  
+  def test_user_custom_roles
+    @controller = Test::SecuredUserCustomRolesController.new
+    
+    get :a
+    assert_response :success
+    assert_select 'div.success'
+    
+    get :b
+    assert_response :success
+    assert_select 'div.success'
     
     get :c
     assert_response :success

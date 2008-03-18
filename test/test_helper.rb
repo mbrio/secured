@@ -28,88 +28,143 @@ require 'action_controller/test_process'
 ActionController::Base.logger = nil
 ActionController::Routing::Routes.reload rescue nil
 
-class User
+class Test::Guest
+  include Secured::Guest
+end
+
+class Test::User
+  include Secured::User
   attr_accessor :role
+end
+
+class Test::UserManyRoles
+  include Secured::User
+  attr_accessor :roles
+end
+
+class Test::UserNoRoles
+  include Secured::User
+end
+
+class Test::UserCustomRoles
+  include Secured::User
   
-  def guest?
-    false
-  end
-  
-  def is_in_role?(roles)
-    roles = roles || []
-    roles = [roles] unless roles.is_a?(Array)
-    
-    return true if role && roles.include?(role)
-    false
+  def is_in_role?(role_list)
+    return true
   end
 end
 
-class SecuredController < ActionController::Base
-  include Secured
-  
+class Test::SecuredController < ActionController::Base  
   def rescue_action(exception)
     if exception.is_a?(Secured::SecurityError)
-      render :text => %{ <div class="error">You do not have the permissions to view this page</div>
-                         <div class="flash">#{flash[:notice]}</div> }
+      render :inline => %{ <div class="error">You do not have the permissions to view this page</div>
+                           <div class="flash">#{flash[:notice]}</div> }
+    else
+      raise exception
     end
   end
   
   def a
-    render :text => %{ <div class="success">You have the permissions to view this page</div>
-                       <div class="flash">#{flash[:notice]}</div> }
+    render :inline => %{ <div class="success">You have the permissions to view this page</div>
+                         <div class="flash">#{flash[:notice]}</div> }
   end
   
   def b
-    render :text => %{ <div class="success">You have the permissions to view this page</div>
-                       <div class="flash">#{flash[:notice]}</div> }
+    render :inline => %{ <div class="success">You have the permissions to view this page</div>
+                         <div class="flash">#{flash[:notice]}</div> }
   end
 
   def c
-   render :text => %{ <div class="success">You have the permissions to view this page</div>
-                      <div class="flash">#{flash[:notice]}</div> }
- end
+   render :inline => %{ <div class="success">You have the permissions to view this page</div>
+                        <div class="flash">#{flash[:notice]}</div> }
+  end
+  
+  def d
+    render :inline => %{ <% secured(:for_roles => :administrators) do %><div class="administration">Only administrators can see this</div><% end %>
+                         <% secured(:for_roles => :users) do %><div class="users">Only users can see this</div><% end %> }
+  end
 end
 
-class SecuredOnlyController < SecuredController
+class Test::SecuredOnlyController < Test::SecuredController
   include Secured
   
   secured :only => [:a]
 end
 
-class SecuredExceptController < SecuredController
+class Test::SecuredExceptController < Test::SecuredController
   include Secured
   
   secured :except => [:b]
 end
 
-class SecuredMultiController < SecuredController
+class Test::SecuredMultiController < Test::SecuredController
   include Secured
 
   secured :except => [:b]  
   secured :only => [:b]
 end
 
-class SecuredGuestController < SecuredController
+class Test::SecuredGuestController < Test::SecuredController
   include Secured
 
   before_filter :initialize_user
   secured :only => :a
-  secured :only => :b, :for_roles => :administrator
+  secured :only => :b, :for_roles => :administrators
   
   def initialize_user
-    @user = Guest.new
+    @user = Test::Guest.new
   end
 end
 
-class SecuredRoleController < SecuredController
+class Test::SecuredRoleController < Test::SecuredController
   include Secured
 
   before_filter :initialize_user
-  secured :only => :a, :for_roles => :user
-  secured :only => :b, :for_roles => :administrator
+  secured :only => :a, :for_roles => :users
+  secured :only => :b, :for_roles => :administrators
   
   def initialize_user
-    @user = User.new
-    @user.role = :user
+    @user = Test::User.new
+    @user.role = :users
+  end
+end
+
+class Test::SecuredUserManyRolesController < Test::SecuredController
+  include Secured
+
+  before_filter :initialize_user
+  secured :only => :a, :for_roles => :users
+  secured :only => :b, :for_roles => :administrators
+  secured :only => :c, :for_roles => :editors
+  
+  def initialize_user
+    @user = Test::UserManyRoles.new
+    @user.roles = [:users, :administrators]
+  end
+end
+
+class Test::SecuredUserNoRolesController < Test::SecuredController
+  include Secured
+
+  before_filter :initialize_user
+  secured :only => :a, :for_roles => :users
+  secured :only => :b, :for_roles => :administrators
+  secured :only => :c, :for_roles => :editors
+  
+  def initialize_user
+    @user = Test::UserNoRoles.new
+  end
+end
+
+class Test::SecuredUserCustomRolesController < Test::SecuredController
+  include Secured
+
+  before_filter :initialize_user
+  secured :only => :a, :for_roles => :users
+  secured :only => :b, :for_roles => :administrators
+  secured :only => :c, :for_roles => :editors
+  
+  def initialize_user
+    @user = Test::UserCustomRoles.new
   end
 end

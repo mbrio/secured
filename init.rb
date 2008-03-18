@@ -20,14 +20,4 @@
 # Copyright:: Copyright (C) 2008 Michael Diolosa <michael.diolosa@gmail.com>
 # License:: Distributes under the AGPL
 
-module Secured
-  module Guest
-    def guest?
-      true
-    end
-  
-    def is_in_role?(role_list)
-      false
-    end
-  end
-end
+require 'secured'

@@ -21,13 +21,17 @@
 # License:: Distributes under the AGPL
 
 module Secured
-  module Guest
+  module User
     def guest?
-      true
-    end
-  
-    def is_in_role?(role_list)
       false
+    end
+
+    def is_in_role?(role_list)
+      return (@roles & role_list.to_a).length > 0 if @roles
+      
+      return role_list.to_a.include?(@role) if @role
+      
+      return false
     end
   end
 end
