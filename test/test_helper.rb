@@ -54,7 +54,13 @@ class Test::UserCustomRoles
   end
 end
 
-class Test::SecuredController < ActionController::Base  
+class Test::SecuredController < ActionController::Base
+  before_filter :initialize_user
+    
+  def initialize_user
+    @user = Test::Guest.new
+  end
+  
   def rescue_action(exception)
     if exception.is_a?(Secured::SecurityError)
       render :inline => %{ <div class="error">You do not have the permissions to view this page</div>

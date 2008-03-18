@@ -27,35 +27,21 @@ require 'secured/user'
 module Secured
   def self.included(controller)
     controller.extend(ClassMethods)
-
+    
     unless ActionView::Base.instance_methods.include? 'secured'
       ActionView::Base.class_eval { include ViewHelpers }
     end
   end
-  
+
   module ViewHelpers
     def secured(options={}, &block)
-      roles = options[:for_roles] || []
+      roles = options[:for_roles]
       roles = [roles] unless roles.is_a?(Array)
 
-      # If a user is supplied and the roles have been left empty,
-      # we need to be sure only that the user is not a guest
-      if @user && roles.empty?
-        if @user.respond_to?(:guest?) && !@user.guest?
-          yield
-        end
-
-      # If a user is supplied and the roles nave not been left empty,
-      # we need to be sure the user is within one of the roles
-      # supplied
-      elsif @user && !roles.empty?
-        if @user.respond_to?(:is_in_role?) && @user.is_in_role?(roles)
-          yield
-        end
-      end
+      self.controller.class.secure_me(@user, roles) { yield }
     end
   end
-  
+
   module ClassMethods
     def secured(options={})
       filter_opts = { :only => options[:only], :except => options[:except] }
@@ -64,27 +50,21 @@ module Secured
         controller.check_security(options)
       end
     end
-  end
-  
-  def check_security(options={})
-    roles = options[:for_roles] || []
-    roles = [roles] unless roles.is_a?(Array)
 
-    # If a user is supplied and the roles have been left empty,
-    # we need to be sure only that the user is not a guest
-    if @user && roles.empty?
-      if @user.respond_to?(:guest?) && !@user.guest?
-        return
-      end
-
-    # If a user is supplied and the roles nave not been left empty,
-    # we need to be sure the user is within one of the roles
-    # supplied
-    elsif @user && !roles.empty?
-      if @user.respond_to?(:is_in_role?) && @user.is_in_role?(roles)
-        return
+    def secure_me(user, roles, &block)
+      if roles.empty?
+        yield if !user.guest?
+      else
+        yield if user.is_in_role?(roles)
       end
     end
+  end
+
+  def check_security(options={})
+    roles = options[:for_roles]
+    roles = [roles] unless roles.is_a?(Array)
+
+    self.class.secure_me(@user, roles) { return }
 
     raise Secured::SecurityError
   end
