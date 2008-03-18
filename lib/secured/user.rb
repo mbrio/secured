@@ -28,6 +28,7 @@ module Secured
 
     def is_in_role?(role_list)
       unless role_list.nil?
+        role_list = role_list || []
         role_list = [role_list] unless role_list.is_a?(Array)
       
         return (@roles & role_list).length > 0 if @roles

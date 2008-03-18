@@ -35,7 +35,7 @@ module Secured
 
   module ViewHelpers
     def secured(options={}, &block)
-      roles = options[:for_roles]
+      roles = options[:for_roles] || []
       roles = [roles] unless roles.is_a?(Array)
 
       self.controller.class.secure_me(@user, roles) { yield }
@@ -61,7 +61,7 @@ module Secured
   end
 
   def check_security(options={})
-    roles = options[:for_roles]
+    roles = options[:for_roles] || []
     roles = [roles] unless roles.is_a?(Array)
 
     self.class.secure_me(@user, roles) { return }
