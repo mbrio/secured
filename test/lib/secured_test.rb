@@ -198,20 +198,50 @@ class SecuredTest < Test::Unit::TestCase
     
     get :a, :format => 'xml'
     assert_response :success
-    assert_select 'success'
-
-    @request = ActionController::TestRequest.new
-    @response = ActionController::TestResponse.new
+    assert_select 'div.error'
+    
+    @request    = ActionController::TestRequest.new
+    @response   = ActionController::TestResponse.new
     
     get :a, :format => 'html'
     assert_response :success
-    assert_select 'div.error'
+    assert_select 'div.success'
 
     get :b
     assert_response :success
     assert_select 'div.success'
 
     get :c
+    assert_response :success
+    assert_select 'div.success'
+    
+    @request    = ActionController::TestRequest.new
+    @response   = ActionController::TestResponse.new
+
+    get :c, :format => 'xml'
+    assert_response :success
+    assert_select 'div.success'
+    
+
+    @controller = Test::SecuredGuestFormat.new
+    @request    = ActionController::TestRequest.new
+    @response   = ActionController::TestResponse.new
+
+    get :c
+    assert_response :success
+    assert_select 'div.success'
+    
+    @request    = ActionController::TestRequest.new
+    @response   = ActionController::TestResponse.new
+
+    get :c, :format => 'xml'
+    assert_response :success
+    assert_select 'div.error'
+    
+    @request    = ActionController::TestRequest.new
+    @response   = ActionController::TestResponse.new
+
+    get :c, :format => 'html'
     assert_response :success
     assert_select 'div.success'
   end

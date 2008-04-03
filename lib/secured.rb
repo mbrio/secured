@@ -60,14 +60,19 @@ module Secured
     roles = option_to_array(options[:for_roles])
     formats = option_to_array(options[:for_formats])
     
-    if formats.empty? || formats.include?(self.request.format.to_sym)
+    formats_included = formats.include?(self.request.format.to_sym)
+    
+    if formats.empty? || formats_included
       # If no roles are specified just be sure the user is
       # not a guest otherwise check the user's roles
+    
       if roles.empty?
         yield if !user.guest?
       else
         yield if user.is_in_role?(roles)
       end
+    elsif !formats_included
+      yield
     end
   end
   
