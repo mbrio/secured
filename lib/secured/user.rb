@@ -35,7 +35,19 @@ module Secured
         return role_list.include?(@role) if @role
       end
       
-      return false
+      false
+    end
+    
+    def is_in_all_roles?(role_list)
+      unless role_list.nil?
+        role_list = role_list || []
+        role_list = [role_list] unless role_list.is_a?(Array)
+      
+        return (@roles & role_list).length == roles_list.length if @roles
+        return role_list.include?(@role) if @role
+      end
+      
+      false
     end
   end
 end

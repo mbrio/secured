@@ -198,3 +198,36 @@ class Test::SecuredUserCustomRolesController < Test::SecuredController
     @user = Test::UserCustomRoles.new
   end
 end
+
+class Test::SecuredCode < Test::SecuredController
+  include Secured
+
+  before_filter :initialize_user
+  
+  def initialize_user
+    @user = Test::UserManyRoles.new
+    @user.roles = [:users]
+  end
+  
+  def a
+    secured(:for_roles => [:users]) do
+      render :inline => %{ <div class="success">You have special permission to view this page</div>
+                           <div class="flash">#{flash[:notice]}</div> }
+      return
+    end
+    
+    render :inline => %{ <div class="success">You have the permissions to view this page</div>
+                         <div class="flash">#{flash[:notice]}</div> }
+  end
+  
+  def b
+    secured(:for_roles => [:administrators]) do
+      render :inline => %{ <div class="success">You have special permission to view this page</div>
+                           <div class="flash">#{flash[:notice]}</div> }
+      return
+    end
+    
+    render :inline => %{ <div class="success">You have the permissions to view this page</div>
+                         <div class="flash">#{flash[:notice]}</div> }
+  end
+end

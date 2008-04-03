@@ -24,48 +24,77 @@ require 'secured/security_error'
 require 'secured/guest'
 require 'secured/user'
 
+# Used for securing an ActionController
 module Secured
+  # Called when the module is included on in a class.
+  # Extends the secured ActionController class, and all
+  # ActionView objects.
   def self.included(controller)
+    # Extend the class methods
     controller.extend(ClassMethods)
     
+    # include the view helpers into ActionView
     unless ActionView::Base.instance_methods.include? 'secured'
       ActionView::Base.class_eval { include ViewHelpers }
     end
   end
+  
+  # Allows for specific bits of code to be secured
+  def secured(options={}, &block)
+    roles = options[:for_roles] || []
+    roles = [roles] unless roles.is_a?(Array)
 
+    # Pass the user and roles to secure_me
+    self.class.secure_me(@user, roles) { yield }
+  end
+  
+  # Runs secure_me on the user and passes the authorized
+  # roles
+  def check_security(options={})
+    roles = options[:for_roles] || []
+    roles = [roles] unless roles.is_a?(Array)
+
+    # Pass the user and roles to secure_me
+    self.class.secure_me(@user, roles) { return }
+
+    raise Secured::SecurityError
+  end
+
+  # These methods will be available to all ActionView
+  # classes/instances
   module ViewHelpers
+    # Allows for specific bits of view code to be secured
     def secured(options={}, &block)
       roles = options[:for_roles] || []
       roles = [roles] unless roles.is_a?(Array)
 
+      # Pass the user and roles to secure_me
       self.controller.class.secure_me(@user, roles) { yield }
     end
   end
 
+  # These methods will be available to the secured controller
   module ClassMethods
+    # Secures specific actions of the controller
     def secured(options={})
       filter_opts = { :only => options[:only], :except => options[:except] }
 
+      # checks the security of the controller's action
       before_filter(filter_opts) do |controller|
         controller.check_security(options)
       end
     end
 
+    # Checks to see if a user is not a guest and is within
+    # the authorized roles
     def secure_me(user, roles, &block)
+      # If no roles are specified just be sure the user is
+      # not a guest otherwise check the user's roles
       if roles.empty?
         yield if !user.guest?
       else
         yield if user.is_in_role?(roles)
       end
     end
-  end
-
-  def check_security(options={})
-    roles = options[:for_roles] || []
-    roles = [roles] unless roles.is_a?(Array)
-
-    self.class.secure_me(@user, roles) { return }
-
-    raise Secured::SecurityError
   end
 end

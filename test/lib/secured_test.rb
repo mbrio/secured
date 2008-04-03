@@ -192,4 +192,20 @@ class SecuredTest < Test::Unit::TestCase
     assert_response :success
     assert_select 'div.success'
   end
+
+  def test_secured_code
+    @controller = Test::SecuredCode.new
+
+    get :a
+    assert_response :success
+    assert_select 'div.success', /special permission/
+
+    get :b
+    assert_response :success
+    assert_select 'div.success', /the permissions/
+
+    get :c
+    assert_response :success
+    assert_select 'div.success'
+  end
 end
