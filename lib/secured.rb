@@ -41,21 +41,15 @@ module Secured
   
   # Allows for specific bits of code to be secured
   def secured(options={}, &block)
-    roles = options[:for_roles] || []
-    roles = [roles] unless roles.is_a?(Array)
-
     # Pass the user and roles to secure_me
-    self.class.secure_me(@user, roles) { yield }
+    self.class.secure_me(@user, options) { yield }
   end
   
   # Runs secure_me on the user and passes the authorized
   # roles
   def check_security(options={})
-    roles = options[:for_roles] || []
-    roles = [roles] unless roles.is_a?(Array)
-
     # Pass the user and roles to secure_me
-    self.class.secure_me(@user, roles) { return }
+    self.class.secure_me(@user, options) { return }
 
     raise Secured::SecurityError
   end
@@ -65,11 +59,8 @@ module Secured
   module ViewHelpers
     # Allows for specific bits of view code to be secured
     def secured(options={}, &block)
-      roles = options[:for_roles] || []
-      roles = [roles] unless roles.is_a?(Array)
-
       # Pass the user and roles to secure_me
-      self.controller.class.secure_me(@user, roles) { yield }
+      self.controller.class.secure_me(@user, options) { yield }
     end
   end
 
@@ -87,7 +78,10 @@ module Secured
 
     # Checks to see if a user is not a guest and is within
     # the authorized roles
-    def secure_me(user, roles, &block)
+    def secure_me(user, options, &block)
+      roles = options[:for_roles] || []
+      roles = [roles] unless roles.is_a?(Array)
+      
       # If no roles are specified just be sure the user is
       # not a guest otherwise check the user's roles
       if roles.empty?
