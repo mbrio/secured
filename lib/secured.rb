@@ -42,16 +42,40 @@ module Secured
   # Allows for specific bits of code to be secured
   def secured(options={}, &block)
     # Pass the user and roles to secure_me
-    self.class.secure_me(@user, options) { yield }
+    self.secure_me(@user, options) { yield }
   end
   
   # Runs secure_me on the user and passes the authorized
   # roles
   def check_security(options={})
     # Pass the user and roles to secure_me
-    self.class.secure_me(@user, options) { return }
+    self.secure_me(@user, options) { return }
 
     raise Secured::SecurityError
+  end
+  
+  # Checks to see if a user is not a guest and is within
+  # the authorized roles
+  def secure_me(user, options, &block)
+    roles = option_to_array(options[:for_roles])
+    formats = option_to_array(options[:for_formats])
+    
+    if formats.empty? || formats.include?(self.request.format.to_sym)
+      # If no roles are specified just be sure the user is
+      # not a guest otherwise check the user's roles
+      if roles.empty?
+        yield if !user.guest?
+      else
+        yield if user.is_in_role?(roles)
+      end
+    end
+  end
+  
+  def option_to_array(options)
+    arr = options || []
+    arr = [arr] unless arr.is_a?(Array)
+    
+    arr
   end
 
   # These methods will be available to all ActionView
@@ -60,7 +84,7 @@ module Secured
     # Allows for specific bits of view code to be secured
     def secured(options={}, &block)
       # Pass the user and roles to secure_me
-      self.controller.class.secure_me(@user, options) { yield }
+      self.controller.secure_me(@user, options) { yield }
     end
   end
 
@@ -73,21 +97,6 @@ module Secured
       # checks the security of the controller's action
       before_filter(filter_opts) do |controller|
         controller.check_security(options)
-      end
-    end
-
-    # Checks to see if a user is not a guest and is within
-    # the authorized roles
-    def secure_me(user, options, &block)
-      roles = options[:for_roles] || []
-      roles = [roles] unless roles.is_a?(Array)
-      
-      # If no roles are specified just be sure the user is
-      # not a guest otherwise check the user's roles
-      if roles.empty?
-        yield if !user.guest?
-      else
-        yield if user.is_in_role?(roles)
       end
     end
   end

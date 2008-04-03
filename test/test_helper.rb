@@ -199,6 +199,32 @@ class Test::SecuredUserCustomRolesController < Test::SecuredController
   end
 end
 
+class Test::SecuredFormat < Test::SecuredController
+  include Secured
+
+  before_filter :initialize_user
+  secured :only => :a, :for_roles => :users, :for_formats => :xml
+  secured :only => :b, :for_roles => :administrators
+  secured :only => :c, :for_roles => :editors
+  
+  def initialize_user
+    @user = Test::UserCustomRoles.new
+  end
+  
+  def a    
+    respond_to do |format|
+      format.html do
+        render :inline => %{ <div class="success">You have the permissions to view this page</div>
+                             <div class="flash">#{flash[:notice]}</div> }
+      end
+      
+      format.xml do
+        render :xml => "<data><success>You have the permissions to view this page</success><notice>#{flash[:notice]}</notice></data>"
+      end
+    end
+  end
+end
+
 class Test::SecuredCode < Test::SecuredController
   include Secured
 

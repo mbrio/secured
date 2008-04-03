@@ -193,6 +193,29 @@ class SecuredTest < Test::Unit::TestCase
     assert_select 'div.success'
   end
 
+  def test_secured_format
+    @controller = Test::SecuredFormat.new
+    
+    get :a, :format => 'xml'
+    assert_response :success
+    assert_select 'success'
+
+    @request = ActionController::TestRequest.new
+    @response = ActionController::TestResponse.new
+    
+    get :a, :format => 'html'
+    assert_response :success
+    assert_select 'div.error'
+
+    get :b
+    assert_response :success
+    assert_select 'div.success'
+
+    get :c
+    assert_response :success
+    assert_select 'div.success'
+  end
+
   def test_secured_code
     @controller = Test::SecuredCode.new
 
