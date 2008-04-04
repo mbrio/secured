@@ -94,9 +94,9 @@ module Secured
     roles = option_to_array(options[:for_roles])
 
     if roles.empty?
-      yield if !user.guest?
+      yield and return if !user.guest?
     else
-      yield if user.is_in_role?(roles)
+      yield and return if user.is_in_role?(roles)
     end
     
     raise SecurityError if options[:required]
