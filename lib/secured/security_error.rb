@@ -22,5 +22,8 @@
 
 module Secured
   class SecurityError < StandardError
+    def handle_response!(response)
+      response.headers['status'] = '401'
+    end
   end
 end

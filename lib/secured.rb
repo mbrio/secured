@@ -29,58 +29,16 @@ module Secured
   # Called when the module is included on in a class.
   # Extends the secured ActionController class, and all
   # ActionView objects.
-  def self.included(controller)
-    # Extend the class methods
-    controller.extend(ClassMethods)
+  class <<self
+    def included(controller)
+      # Extend the class methods
+      controller.extend(ClassMethods)
     
-    # include the view helpers into ActionView
-    unless ActionView::Base.instance_methods.include? 'secured'
-      ActionView::Base.class_eval { include ViewHelpers }
-    end
-  end
-  
-  # Allows for specific bits of code to be secured
-  def secured(options={}, &block)
-    # Pass the user and roles to secure_me
-    self.secure_me(@user, options) { yield }
-  end
-  
-  # Runs secure_me on the user and passes the authorized
-  # roles
-  def check_security(options={})
-    # Pass the user and roles to secure_me
-    self.secure_me(@user, options) { return }
-
-    raise Secured::SecurityError
-  end
-  
-  # Checks to see if a user is not a guest and is within
-  # the authorized roles
-  def secure_me(user, options, &block)
-    roles = option_to_array(options[:for_roles])
-    formats = option_to_array(options[:for_formats])
-    
-    formats_included = formats.include?(self.request.format.to_sym)
-    
-    if formats.empty? || formats_included
-      # If no roles are specified just be sure the user is
-      # not a guest otherwise check the user's roles
-    
-      if roles.empty?
-        yield if !user.guest?
-      else
-        yield if user.is_in_role?(roles)
+      # include the view helpers into ActionView
+      unless ActionView::Base.instance_methods.include? 'secured'
+        ActionView::Base.class_eval { include ViewHelpers }
       end
-    elsif !formats_included
-      yield
     end
-  end
-  
-  def option_to_array(options)
-    arr = options || []
-    arr = [arr] unless arr.is_a?(Array)
-    
-    arr
   end
 
   # These methods will be available to all ActionView
@@ -104,5 +62,51 @@ module Secured
         controller.check_security(options)
       end
     end
+  end
+  
+  # Allows for specific bits of code to be secured
+  def secured(options={}, &block)
+    # Pass the user and roles to secure_me
+    self.secure_me(@user, options) { yield }
+  end
+  
+  # Runs secure_me on the user and passes the authorized
+  # roles
+  def check_security(options={})
+    # Pass the user and roles to secure_me
+    self.secure_me(@user, options) { return }
+    
+    raise Secured::SecurityError
+  end
+  
+protected
+
+  # Checks to see if a user is not a guest and is within
+  # the authorized roles
+  def secure_me(user, options, &block)
+    roles = option_to_array(options[:for_roles])
+    formats = option_to_array(options[:for_formats])
+    
+    formats_included = formats.include?(self.request.format.to_sym)
+    
+    if formats.empty? || formats_included
+      # If no roles are specified just be sure the user is
+      # not a guest otherwise check the user's roles
+    
+      if roles.empty?
+        yield if !user.guest?
+      else
+        yield if user.is_in_role?(roles)
+      end
+    elsif !formats_included
+      yield
+    end
+  end
+
+  def option_to_array(options)
+    arr = options || []
+    arr = [arr] unless arr.is_a?(Array)
+    
+    arr
   end
 end
