@@ -265,8 +265,7 @@ class Test::SecuredCode < Test::SecuredController
   def a
     secured(:for_roles => [:users]) do
       render :inline => %{ <div class="success">You have special permission to view this page</div>
-                           <div class="flash">#{flash[:notice]}</div> }
-      return
+                           <div class="flash">#{flash[:notice]}</div> } and return
     end
     
     render :inline => %{ <div class="success">You have the permissions to view this page</div>
@@ -274,13 +273,12 @@ class Test::SecuredCode < Test::SecuredController
   end
   
   def b
-    secured(:for_roles => [:administrators]) do
+    if authorized?(:for_roles => [:administrators])
       render :inline => %{ <div class="success">You have special permission to view this page</div>
                            <div class="flash">#{flash[:notice]}</div> }
-      return
+    else    
+      render :inline => %{ <div class="success">You have the permissions to view this page</div>
+                           <div class="flash">#{flash[:notice]}</div> }
     end
-    
-    render :inline => %{ <div class="success">You have the permissions to view this page</div>
-                         <div class="flash">#{flash[:notice]}</div> }
   end
 end
