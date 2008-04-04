@@ -85,9 +85,7 @@ module Secured
   # roles
   def check_security(options={})
     # Pass the user and roles to secure_me
-    self.secure_me(@user, options) { return }
-    
-    raise Secured::SecurityError
+    self.secure_me(@user, options.merge({ :raise_error => true })) { return }
   end
 
   # Checks to see if a user is not a guest and is within
@@ -100,6 +98,8 @@ module Secured
     else
       yield if user.is_in_role?(roles)
     end
+    
+    raise SecurityError if options[:raise_error]
   end
   
 protected
