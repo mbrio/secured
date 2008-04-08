@@ -197,8 +197,7 @@ class SecuredTest < Test::Unit::TestCase
     @controller = Test::SecuredFormat.new
     
     get :a, :format => 'xml'
-    assert_response :success
-    assert_select 'div.error'
+    assert_response :unauthorized
     
     @request    = ActionController::TestRequest.new
     @response   = ActionController::TestResponse.new
@@ -235,8 +234,7 @@ class SecuredTest < Test::Unit::TestCase
     @response   = ActionController::TestResponse.new
 
     get :c, :format => 'xml'
-    assert_response :success
-    assert_select 'div.error'
+    assert_response :unauthorized
     
     @request    = ActionController::TestRequest.new
     @response   = ActionController::TestResponse.new
