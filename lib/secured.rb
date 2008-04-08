@@ -92,11 +92,18 @@ module Secured
   # the authorized roles
   def secure_me(user, options, &block)
     roles = option_to_array(options[:for_roles])
+    formats = option_to_array(options[:for_formats])
 
-    if roles.empty?
-      yield and return if !user.guest?
-    else
-      yield and return if user.is_in_role?(roles)
+    in_format = formats.include?(self.request.format.to_sym)
+
+    if formats.empty? || in_format
+      if roles.empty?
+        yield and return if !user.guest?
+      else
+        yield and return if user.is_in_role?(roles)
+      end
+    elsif !in_format
+      yield and return
     end
     
     raise SecurityError if options[:required]
