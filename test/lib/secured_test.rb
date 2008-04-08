@@ -244,6 +244,13 @@ class SecuredTest < Test::Unit::TestCase
     get :c, :format => 'html'
     assert_response :success
     assert_select 'div.success'
+    
+    @controller = Test::SecuredFormat.new
+    @request    = ActionController::TestRequest.new
+    @response   = ActionController::TestResponse.new
+    
+    get :d, :format => 'xml'
+    assert_response :unauthorized
   end
 
   def test_secured_code

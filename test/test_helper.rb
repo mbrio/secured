@@ -232,10 +232,15 @@ class Test::SecuredFormat < Test::SecuredController
   secured :only => :a, :for_roles => :users, :for_formats => :xml
   secured :only => :b, :for_roles => :administrators
   secured :only => :c, :for_formats => :xml
+  secured :only => :d, :for_roles => :users, :for_formats => :xml, :handler => :xml_unauthorized
   
   def initialize_user
     @user = Test::User.new
     @user.role = :administrators
+  end
+  
+  def xml_unauthorized
+    head :unauthorized
   end
   
   def a    
