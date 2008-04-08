@@ -233,6 +233,7 @@ class Test::SecuredFormat < Test::SecuredController
   secured :only => :b, :for_roles => :administrators
   secured :only => :c, :for_formats => :xml
   secured :only => :d, :for_roles => :users, :for_formats => :xml, :handler => :xml_unauthorized
+  secured :only => :e, :for_roles => :users, :for_formats => :xml, :status_only => true
   
   def initialize_user
     @user = Test::User.new
@@ -244,6 +245,19 @@ class Test::SecuredFormat < Test::SecuredController
   end
   
   def a    
+    respond_to do |format|
+      format.html do
+        render :inline => %{ <div class="success">You have the permissions to view this page</div>
+                             <div class="flash">#{flash[:notice]}</div> }
+      end
+      
+      format.xml do
+        render :xml => "<data><success>You have the permissions to view this page</success><notice>#{flash[:notice]}</notice></data>"
+      end
+    end
+  end
+  
+  def e
     respond_to do |format|
       format.html do
         render :inline => %{ <div class="success">You have the permissions to view this page</div>

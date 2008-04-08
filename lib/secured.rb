@@ -93,6 +93,7 @@ module Secured
   def secure_me(user, options, &block)
     roles = option_to_array(options[:for_roles])
     formats = option_to_array(options[:for_formats])
+    status_only = options[:status_only]
     handler = options[:handler]
 
     in_format = formats.include?(self.request.format.to_sym)
@@ -107,7 +108,8 @@ module Secured
       yield and return
     end
     
-    self.send(handler) and return unless handler.nil?
+    self.send(handler) and return if handler
+    head :unauthorized and return if status_only
     raise SecurityError if options[:required]
   end
   
