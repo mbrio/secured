@@ -1,7 +1,7 @@
 # Secured is a rails plugin that adds role based access priviledges
 # to control actions
 #
-# Copyright (C) 2008 Michael Diolosa <michael.diolosa@gmail.com>
+# Copyright (C) 2008-2009 Michael Diolosa <michael.diolosa@me.com>
 # 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -16,8 +16,8 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-# Author:: Michael Diolosa (mailto:michael.diolosa@gmail.com)
-# Copyright:: Copyright (C) 2008 Michael Diolosa <michael.diolosa@gmail.com>
+# Author:: Michael Diolosa (mailto:michael.diolosa@me.com)
+# Copyright:: Copyright (C) 2008-2009 Michael Diolosa <michael.diolosa@me.com>
 # License:: Distributes under the AGPL
 
 module Secured
