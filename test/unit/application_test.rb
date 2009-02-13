@@ -1,7 +1,7 @@
 require File.join(File.dirname(__FILE__), '..', 'test_helper')
 
 class ApplicationTest < ActiveSupport::TestCase
-  test "truth" do
-    assert true
+  test "creation" do
+    assert_kind_of Application, Application.new
   end
 end

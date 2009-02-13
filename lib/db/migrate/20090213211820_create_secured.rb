@@ -15,6 +15,7 @@ class CreateSecured < ActiveRecord::Migration
     
     create_table :roles, :force => true do |t|
       t.timestamps
+      t.references :applications
       t.string :name
     end
     add_index :roles, [:name], :unique => true
