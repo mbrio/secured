@@ -1,0 +1,4 @@
+.DS_Store
+._*
+test/db/*
+test/log/*
