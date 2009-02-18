@@ -8,26 +8,26 @@ class CreateSecured < ActiveRecord::Migration
     
     create_table :users, :force => true do |t|
       t.timestamps
-      t.references :applications
+      t.references :application
       t.string :name
     end
     add_index :users, [:name], :unique => true
     
     create_table :roles, :force => true do |t|
       t.timestamps
-      t.references :applications
+      t.references :application
       t.string :name
     end
     add_index :roles, [:name], :unique => true
     
     create_table :roles_users, :id => false, :force => true do |t|
-      t.references :users, :roles
+      t.references :user, :role
     end
-    add_index :roles_users, [:roles_id, :users_id], :unique => true
+    add_index :roles_users, [:role_id, :user_id], :unique => true
   end
 
   def self.down
-    remove_index :roles_users, [:roles_id, :users_id]
+    remove_index :roles_users, [:role_id, :user_id]
     drop_table :roles_users
     
     remove_index :roles, [:name]

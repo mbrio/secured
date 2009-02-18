@@ -22,10 +22,11 @@ config = YAML::load(IO.read(File.join(File.dirname(__FILE__), 'config', 'databas
 ActiveRecord::Base.logger = Logger.new(File.join(log_dir, 'test.log'))
 ActiveRecord::Base.establish_connection(config['test'])
 
-I18n.load_path = Dir[File.join(File.dirname(__FILE__), 'config', 'locales', '*.{rb,yml}')]
-I18n.default_locale = :en
-I18n.reload!
-
 require File.join(File.dirname(__FILE__), '..', 'init.rb')
 
 CreateSecured.up
+
+fixture_dir = File.join(File.dirname(__FILE__), "fixtures");
+fixtures = Dir["#{fixture_dir}/*.yml"]
+fixtures.collect! {|t| File.basename(t, '.yml')}
+Fixtures.create_fixtures(fixture_dir, fixtures)

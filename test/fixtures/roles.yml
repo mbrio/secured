@@ -1,0 +1,6 @@
+admins:
+    name: Administrators
+    application: website
+users:
+    name: Users
+    application: website

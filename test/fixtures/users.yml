@@ -1,0 +1,4 @@
+administrator:
+    name: Administrator
+    roles: admins, users
+    application: website
