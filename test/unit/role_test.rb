@@ -7,8 +7,11 @@ class RoleTest < ActiveSupport::TestCase
     role = Role.new
     assert !role.save
     
-    role.name = "test"
+    role.name = "tests"
     assert !role.save
+    
+    role.application = Application.find_by_name("website")
+    assert role.save
   end
   
   test "query" do

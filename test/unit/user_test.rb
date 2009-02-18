@@ -6,6 +6,15 @@ class UserTest < ActiveSupport::TestCase
     
     user = User.new
     assert !user.save
+    
+    user.name = "test"
+    assert !user.save
+    
+    user.application = Application.find_by_name("website")
+    assert !user.save
+    
+    user.roles << Role.find_by_name("Users");
+    assert user.save
   end
   
   test "query" do
