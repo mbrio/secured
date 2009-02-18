@@ -11,14 +11,14 @@ class CreateSecured < ActiveRecord::Migration
       t.references :application
       t.string :name
     end
-    add_index :users, [:name], :unique => true
+    add_index :users, [:name, :application_id], :unique => true
     
     create_table :roles, :force => true do |t|
       t.timestamps
       t.references :application
       t.string :name
     end
-    add_index :roles, [:name], :unique => true
+    add_index :roles, [:name, :application_id], :unique => true
     
     create_table :roles_users, :id => false, :force => true do |t|
       t.references :user, :role
@@ -30,10 +30,10 @@ class CreateSecured < ActiveRecord::Migration
     remove_index :roles_users, [:role_id, :user_id]
     drop_table :roles_users
     
-    remove_index :roles, [:name]
+    remove_index :roles, [:name, :application_id]
     drop_table :roles
     
-    remove_index :users, [:name]
+    remove_index :users, [:name, :application_id]
     drop_table :users
     
     remove_index :applications, [:name]

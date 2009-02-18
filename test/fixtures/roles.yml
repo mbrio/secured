@@ -4,3 +4,9 @@ admins:
 users:
     name: Users
     application: website
+otheradmins:
+    name: Administrators
+    application: other
+otherusers:
+    name: Users
+    application: other

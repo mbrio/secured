@@ -2,3 +2,7 @@ administrator:
     name: Administrator
     roles: admins, users
     application: website
+otheradministrator:
+    name: Administrator
+    roles: otheradmins, otherusers
+    application: other
