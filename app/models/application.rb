@@ -1,3 +1,4 @@
+# The application domain the users and roles belong to
 class Application < ActiveRecord::Base
   cattr_accessor :name_regex, :name_within
   
@@ -8,9 +9,12 @@ class Application < ActiveRecord::Base
   has_many :roles
   
   validates_presence_of :name
+  
   validates_uniqueness_of :name
   validates_length_of :name, :within => Application.name_within
   validates_format_of :name, :with => Application.name_regex
   
   named_scope :by_name, lambda { |name| { :conditions => { :name => name }, :limit => 1 } }
+  
+  attr_accessible :name
 end

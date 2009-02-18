@@ -3,10 +3,13 @@ require File.join(File.dirname(__FILE__), '..', '..', 'test_helper')
 class RoleValidationTest < ActiveSupport::TestCase
   test "validation name presence" do
     params = ModelDefaults.role
+    app = params.delete(:application)
     name = params.delete(:name)
     
     # invalid presence
-    role = Role.new(params)
+    role = Role.new(params) do |r|
+      r.application = app
+    end
     assert !role.save
   
     # invalid length min
@@ -32,34 +35,46 @@ class RoleValidationTest < ActiveSupport::TestCase
     role.application = app
     assert role.save
   end
-
+  
   test "validation name uniqueness" do
     params = ModelDefaults.role
+    app = params.delete(:application)
     other = Application.by_name("other").first    
     
     # correct
-    role = Role.new(params)
+    role = Role.new(params) do |r|
+      r.application = app
+    end
     assert role.save
   
     # invalid uniqueness
-    role = Role.new(params)
+    role = Role.new(params) do |r|
+      r.application = app
+    end
     assert !role.save
     
     # correct
-    role = Role.new(params.merge!({ :application => other }))
+    role = Role.new(params) do |r|
+      r.application = other
+    end
     assert role.save
     
     # invalid uniqueness
-    role = Role.new(params)
+    role = Role.new(params) do |r|
+      r.application = other
+    end
     assert !role.save
   end
-
+  
   test "validation name format" do
     params = ModelDefaults.role
+    app = params.delete(:application)
     name = params.delete(:name)
     
     # invalid character
-    role = Role.new(params.merge({ :name => '!' }))
+    role = Role.new(params.merge({ :name => '!' })) do |r|
+      r.application = app
+    end
     assert !role.save
   
     # invalid starting character
@@ -71,7 +86,9 @@ class RoleValidationTest < ActiveSupport::TestCase
     assert role.save
   
     # correct
-    role = Role.new(params.merge({ :name => '0a.-_@' }))
+    role = Role.new(params.merge({ :name => '0a.-_@' })) do |r|
+      r.application = app
+    end
     assert role.save
   end
 end

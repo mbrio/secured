@@ -1,5 +1,7 @@
+# The migration that creates the database tables necessary for the secured
+# engine
 class CreateSecured < ActiveRecord::Migration
-  def self.up
+  def self.up #:nodoc:
     create_table :applications, :force => true do |t|
       t.timestamps
       t.string :name
@@ -9,8 +11,9 @@ class CreateSecured < ActiveRecord::Migration
     create_table :users, :force => true do |t|
       t.timestamps
       t.references :application
-      t.string :name
+      t.string :name, :email
     end
+    add_index :users, [:email, :application_id], :unique => true
     add_index :users, [:name, :application_id], :unique => true
     
     create_table :roles, :force => true do |t|
@@ -26,7 +29,7 @@ class CreateSecured < ActiveRecord::Migration
     add_index :roles_users, [:role_id, :user_id], :unique => true
   end
 
-  def self.down
+  def self.down #:nodoc:
     remove_index :roles_users, [:role_id, :user_id]
     drop_table :roles_users
     
@@ -34,6 +37,7 @@ class CreateSecured < ActiveRecord::Migration
     drop_table :roles
     
     remove_index :users, [:name, :application_id]
+    remove_index :email, [:name, :application_id]
     drop_table :users
     
     remove_index :applications, [:name]

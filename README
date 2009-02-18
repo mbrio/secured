@@ -1,13 +1,21 @@
-Secured
-=======
+= Secured
 
-Introduction goes here.
+A plugin adding a layer of authority, identity, and security to the original
+rails framework.
+
+== Installation
+
+  ruby script/plugin install ssh://deepserve.deepend.com/git/secured.git
+  
+== Usage
+
+=== Prepare database
+
+Generate and apply the migrations and models
+
+  ruby script/generate secured
+  rake db:migrate
 
 
-Example
-=======
-
-Example goes here.
-
-
-Copyright (c) 2009 [name of plugin creator], released under the MIT license
+Copyright (c) 2009 Michael Diolosa <michael.diolosa@me.com>, released under the
+MIT license

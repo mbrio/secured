@@ -15,6 +15,6 @@ module ModelDefaults
     app = Application.by_name("website").first
     role = app.roles.by_name("Users").first
     
-    { :name => 'aaaaaa', :application => app, :roles => [ role ] }
+    { :name => 'aaaaaa', :application => app, :roles => [ role ], :email => 'example@example.com' }
   end
 end
